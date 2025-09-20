@@ -1,3 +1,7 @@
+> 📌 **版本說明**  
+> - `v1.0` (Tag)：初版，作業 deadline 交付的版本  
+> - `main`：優化後的最新版本
+
 ## LRU Cache Implementation Features
 
 - LRU behavior with Get/Put operations and eviction policy
