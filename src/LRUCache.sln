@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LRUCache", "LRUCache.csproj", "{691197C0-2D17-D645-285B-586E7FCFCFB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LRUCache.Tests", "..\test\LRUCache.Tests\LRUCache.Tests.csproj", "{EBD43AE9-FFB2-40F5-B691-1C6FB91694F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{691197C0-2D17-D645-285B-586E7FCFCFB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{691197C0-2D17-D645-285B-586E7FCFCFB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{691197C0-2D17-D645-285B-586E7FCFCFB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD43AE9-FFB2-40F5-B691-1C6FB91694F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD43AE9-FFB2-40F5-B691-1C6FB91694F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD43AE9-FFB2-40F5-B691-1C6FB91694F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD43AE9-FFB2-40F5-B691-1C6FB91694F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

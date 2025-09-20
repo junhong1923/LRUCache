@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-
 namespace LRUCache.Models
 {
     /// <summary>
-    /// 快照類別，用於存儲緩存狀態以支援回滾功能
+    /// CacheSnapshot for storing the state of the cache at a specific point in time
     /// </summary>
     public class CacheSnapshot<TKey, TValue> where TKey : notnull
     {
