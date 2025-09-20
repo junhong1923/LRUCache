@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.IO;
 
 // Snapshot class to store cache state for rollback
 public class CacheSnapshot<TKey, TValue> where TKey : notnull
@@ -15,6 +17,23 @@ public class CacheSnapshot<TKey, TValue> where TKey : notnull
         UsageOrder = new List<TKey>(usageOrder);
         Timestamp = DateTime.Now;
     }
+}
+
+// Serializable snapshot for persistence
+public class SerializableSnapshot<TKey, TValue> where TKey : notnull
+{
+    public Dictionary<TKey, TValue> CacheData { get; set; } = new Dictionary<TKey, TValue>();
+    public List<TKey> UsageOrder { get; set; } = new List<TKey>();
+    public DateTime Timestamp { get; set; }
+}
+
+// Persistence data structure
+public class CachePersistData<TKey, TValue> where TKey : notnull
+{
+    public int Capacity { get; set; }
+    public Dictionary<TKey, TValue> CacheData { get; set; } = new Dictionary<TKey, TValue>();
+    public List<TKey> UsageOrder { get; set; } = new List<TKey>();
+    public List<SerializableSnapshot<TKey, TValue>> History { get; set; } = new List<SerializableSnapshot<TKey, TValue>>();
 }
 
 // Simple LRU Cache implementation using Dictionary + List with History and Rollback
@@ -156,5 +175,129 @@ public class LRUCache<TKey, TValue> where TKey : notnull
             Console.WriteLine($"  [{stepsBack}] {snapshot.Timestamp:HH:mm:ss} - {snapshot.CacheData.Count} items");
         }
         Console.WriteLine();
+    }
+
+    // Persistence and Recovery functionality
+    public void SaveToFile(string filePath)
+    {
+        try
+        {
+            var persistData = new CachePersistData<TKey, TValue>
+            {
+                Capacity = _capacity,
+                CacheData = _cache,
+                UsageOrder = _usageOrder,
+                History = _history.Select(h => new SerializableSnapshot<TKey, TValue>
+                {
+                    CacheData = h.CacheData,
+                    UsageOrder = h.UsageOrder,
+                    Timestamp = h.Timestamp
+                }).ToList()
+            };
+
+            var options = new JsonSerializerOptions 
+            { 
+                WriteIndented = true,
+                IncludeFields = true
+            };
+            
+            // 確保目錄存在
+            string? directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+                Console.WriteLine($"Created directory: {directory}");
+            }
+            
+            string jsonString = JsonSerializer.Serialize(persistData, options);
+            File.WriteAllText(filePath, jsonString);
+            
+            Console.WriteLine($"Cache saved to {filePath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving cache: {ex.Message}");
+            throw;
+        }
+    }
+
+    public void LoadFromFile(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"File {filePath} does not exist");
+                return;
+            }
+
+            string jsonString = File.ReadAllText(filePath);
+            var options = new JsonSerializerOptions 
+            { 
+                IncludeFields = true
+            };
+            
+            var persistData = JsonSerializer.Deserialize<CachePersistData<TKey, TValue>>(jsonString, options);
+            
+            if (persistData == null)
+            {
+                Console.WriteLine("Failed to deserialize cache data");
+                return;
+            }
+
+            // Restore cache state
+            _cache.Clear();
+            _usageOrder.Clear();
+            _history.Clear();
+
+            foreach (var kvp in persistData.CacheData)
+            {
+                _cache[kvp.Key] = kvp.Value;
+            }
+
+            _usageOrder.AddRange(persistData.UsageOrder);
+
+            foreach (var snapshot in persistData.History)
+            {
+                _history.Add(new CacheSnapshot<TKey, TValue>(snapshot.CacheData, snapshot.UsageOrder)
+                {
+                    Timestamp = snapshot.Timestamp
+                });
+            }
+
+            Console.WriteLine($"Cache loaded from {filePath}");
+            Console.WriteLine($"Restored: {Count} items, {HistoryCount} history snapshots");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading cache: {ex.Message}");
+            throw;
+        }
+    }
+
+    // 便利方法：保存到指定資料夾
+    public void SaveToFolder(string folderName = "persistenceData", string fileName = "cache_state.json")
+    {
+        string filePath = Path.Combine(folderName, fileName);
+        SaveToFile(filePath);
+    }
+
+    // 便利方法：從指定資料夾加載
+    public void LoadFromFolder(string folderName = "persistenceData", string fileName = "cache_state.json")
+    {
+        string filePath = Path.Combine(folderName, fileName);
+        LoadFromFile(filePath);
+    }
+
+    // 持久化：始終使用同一個文件（覆蓋模式）
+    public void SavePersistent()
+    {
+        SaveToFolder(); // 使用預設參數：persistenceData/cache_state.json
+    }
+
+    // 從持久化文件加載
+    public void LoadPersistent()
+    {
+        LoadFromFolder(); // 使用預設參數：persistenceData/cache_state.json
     }
 }

@@ -40,5 +40,43 @@ class Program
         cache.PrintState();
         
         cache.PrintHistory();
+        
+        // 測試持久化功能
+        Console.WriteLine("=== 持久化測試 ===");
+        
+        Console.WriteLine("保存當前緩存狀態...");
+        cache.SavePersistent(); // 保存到 persistenceData/cache_state.json
+        
+        Console.WriteLine("\n清空緩存並添加新數據...");
+        var newCache = new LRUCache<string, int>(3);
+        newCache.Put("X", 100);
+        newCache.Put("Y", 200);
+        newCache.PrintState();
+        
+        Console.WriteLine("從持久化文件加載緩存狀態...");
+        newCache.LoadPersistent(); // 從 persistenceData/cache_state.json 加載
+        newCache.PrintState();
+        newCache.PrintHistory();
+        
+        Console.WriteLine("驗證加載的數據是否正確...");
+        Console.WriteLine($"測試 Get A: {newCache.Get("A")}");
+        Console.WriteLine($"測試 Get C: {newCache.Get("C")}");
+        
+        Console.WriteLine($"\n持久化文件: persistenceData/cache_state.json");
+        Console.WriteLine("每次保存都會覆蓋同一個文件，保持簡潔！");
+        
+        // 可選：清理測試文件  
+        // try
+        // {
+        //     if (System.IO.File.Exists(saveFile))
+        //     {
+        //         System.IO.File.Delete(saveFile);
+        //         Console.WriteLine($"\n清理測試文件: {saveFile}");
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"清理文件時出錯: {ex.Message}");
+        // }
     }
 }

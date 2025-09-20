@@ -1,0 +1,38 @@
+{
+  "Capacity": 3,
+  "CacheData": {
+    "A": 1,
+    "B": 2
+  },
+  "UsageOrder": [
+    "A",
+    "B"
+  ],
+  "History": [
+    {
+      "CacheData": {},
+      "UsageOrder": [],
+      "Timestamp": "2025-09-20T12:02:46.490473+08:00"
+    },
+    {
+      "CacheData": {
+        "A": 1
+      },
+      "UsageOrder": [
+        "A"
+      ],
+      "Timestamp": "2025-09-20T12:02:46.4975656+08:00"
+    },
+    {
+      "CacheData": {
+        "A": 1,
+        "B": 2
+      },
+      "UsageOrder": [
+        "A",
+        "B"
+      ],
+      "Timestamp": "2025-09-20T12:02:46.4975751+08:00"
+    }
+  ]
+}
