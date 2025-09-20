@@ -3,41 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.IO;
+using LRUCache.Models;
 
-// Snapshot class to store cache state for rollback
-public class CacheSnapshot<TKey, TValue> where TKey : notnull
+namespace LRUCache.Core
 {
-    public Dictionary<TKey, TValue> CacheData { get; set; }
-    public List<TKey> UsageOrder { get; set; }
-    public DateTime Timestamp { get; set; }
-    
-    public CacheSnapshot(Dictionary<TKey, TValue> cacheData, List<TKey> usageOrder)
-    {
-        CacheData = new Dictionary<TKey, TValue>(cacheData);
-        UsageOrder = new List<TKey>(usageOrder);
-        Timestamp = DateTime.Now;
-    }
-}
-
-// Serializable snapshot for persistence
-public class SerializableSnapshot<TKey, TValue> where TKey : notnull
-{
-    public Dictionary<TKey, TValue> CacheData { get; set; } = new Dictionary<TKey, TValue>();
-    public List<TKey> UsageOrder { get; set; } = new List<TKey>();
-    public DateTime Timestamp { get; set; }
-}
-
-// Persistence data structure
-public class CachePersistData<TKey, TValue> where TKey : notnull
-{
-    public int Capacity { get; set; }
-    public Dictionary<TKey, TValue> CacheData { get; set; } = new Dictionary<TKey, TValue>();
-    public List<TKey> UsageOrder { get; set; } = new List<TKey>();
-    public List<SerializableSnapshot<TKey, TValue>> History { get; set; } = new List<SerializableSnapshot<TKey, TValue>>();
-}
-
-// Simple LRU Cache implementation using Dictionary + List with History and Rollback
-public class LRUCache<TKey, TValue> where TKey : notnull
+    /// <summary>
+    /// LRU (Least Recently Used) 緩存實現
+    /// 支援標準 LRU 行為、歷史記錄回滾和持久化功能
+    /// </summary>
+    public class LRUCache<TKey, TValue> where TKey : notnull
 {
     private readonly int _capacity;
     private readonly Dictionary<TKey, TValue> _cache;
@@ -300,4 +274,5 @@ public class LRUCache<TKey, TValue> where TKey : notnull
     {
         LoadFromFolder(); // 使用預設參數：persistenceData/cache_state.json
     }
+}
 }
